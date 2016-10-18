@@ -43,7 +43,6 @@
 <?=$msg;?>
 
 
-
 Tere tulemast <a href="user.php"><?=$_SESSION["userEmail"];?>!</a>
 <a href="data.php?logout=1">Logi välja </a>
 </p>

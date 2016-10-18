@@ -174,41 +174,48 @@
 		
 	}
 
-	function saveUserInterest ($interest) {
+function saveUserInterest ($interest) {
+	
+	$database = "if16_sandra_2";
+	$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $database);
+
+	$stmt = $mysqli->prepare("
+		SELECT id FROM user_interests 
+		WHERE user_id=? AND interest_id=?
+	");
+	$stmt->bind_param("ii", $_SESSION["userId"], $interest);
+	$stmt->bind_result($id);
+	
+	$stmt->execute();
+	
+	if ($stmt->fetch()) {
+		// oli olemas juba selline rida
+		echo "juba olemas";
+		// pärast returni midagi edasi ei tehta funktsioonis
+		return;
 		
-		$database = "if16_sandra_2";
-		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $database);
-
-		//mitu korda ei saaks ühte hobi lisada
-		$stmt = $mysqli->prepare("SELECT id FROM user_interests WHERE user_id=? AND interest_id=?");
-		$stmt->bind_param("ii", $_SESSION["userId"], $interest);
-		$stmt->bind_result($id);
-
-		$stmt->execute();
-		if ($stmt->fetch()) {
-			//juhul, kuioli olemas juba selline rida
-
-			echo "juba olemas";
-			
-			//pärast returni midagi edasi ei tehta funktsioonis
-			return;
-
-		} else {
-
-		}
-		//kui ei olnud siis sisestan
-
-
-		$stmt = $mysqli->prepare("INSERT INTO user_interests(user_id, interest_id) VALUES (?, ?)");
-		$stmt->bind_param("ii", $_SESSION["userId"], $interest);
-
-		if ($stmt->execute()) {
-			echo "salvestamine õnnestus";
-		} else {
-			 	echo "ERROR ".$stmt->error;
-		}
-
+	} 
+	
+	$stmt->close();
+	
+	// kui ei olnud siis sisestan
+	
+	$stmt = $mysqli->prepare("
+		INSERT INTO user_interests
+		(user_id, interest_id) VALUES (?, ?)
+	");
+	
+	echo $mysqli->error;
+	
+	$stmt->bind_param("ii", $_SESSION["userId"], $interest);
+	
+	if ($stmt->execute()) {
+		echo "salvestamine õnnestus";
+	} else {
+		echo "ERROR ".$stmt->error;
 	}
+	
+}
 	
 	
 	function getAllInterests() {
@@ -216,10 +223,8 @@
 		$database = "if16_sandra_2";
 		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $database);
 		
-		$stmt = $mysqli->prepare("
-			SELECT id, interest
-			FROM interests
-		");
+		$stmt = $mysqli->prepare("SELECT id, interest FROM interests");
+		$stmt->bind_param ("i", $_SESSION["user_id"]);
 		echo $mysqli->error;
 		
 		$stmt->bind_result($id, $interest);
@@ -248,7 +253,45 @@
 		return $result;
 	}	
 		
+	function getAllUserInterests() {
 		
+		$database = "if16_sandra_2";
+		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $database);
+		
+		$stmt = $mysqli->prepare("SELECT interest FROM interests
+			JOIN user_interests 
+			ON interests.id=user_interests.interest_id
+			WHERE user_interests.user_id = ?");
+
+		$stmt->bind_param ("i", $_SESSION["user_id"]);
+		echo $mysqli->error;
+		
+		$stmt->bind_result($interest);
+		$stmt->execute();
+		
+		
+		//tekitan massiivi
+		$result = array();
+		
+		// tee seda seni, kuni on rida andmeid
+		// mis vastab select lausele
+		while ($stmt->fetch()) {
+			
+			//tekitan objekti
+			$i = new StdClass();
+			
+		
+			$i->interest = $interest;
+		
+			array_push($result, $i);
+		}
+		
+		$stmt->close();
+		$mysqli->close();
+		
+		return $result;
+	}	
+				
 	
 	
 	
