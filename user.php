@@ -35,6 +35,13 @@
 		saveInterest(cleanInput($_POST["interest"]));
 		
 	}
+	if ( isset($_POST["userInterest"]) &&
+		!empty($_POST["userInterest"])
+		) {
+
+		saveUserInterest(cleanInput($_POST["userInterest"]));
+	}
+
 	
     $interests = getAllInterests();
 ?>
@@ -55,11 +62,9 @@
 		
 		
 		$listHtml .= "<li>".$i->interest."</li>";
-
 	}
     
     $listHtml .= "</ul>";
-
 	
 	echo $listHtml;
     
