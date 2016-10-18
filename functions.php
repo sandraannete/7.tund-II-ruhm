@@ -218,13 +218,15 @@ function saveUserInterest ($interest) {
 }
 	
 	
-	function getAllInterests() {
+function getAllInterests() {
 		
 		$database = "if16_sandra_2";
 		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $database);
 		
-		$stmt = $mysqli->prepare("SELECT id, interest FROM interests");
-		$stmt->bind_param ("i", $_SESSION["user_id"]);
+		$stmt = $mysqli->prepare("
+			SELECT id, interest
+			FROM interests
+		");
 		echo $mysqli->error;
 		
 		$stmt->bind_result($id, $interest);
@@ -251,19 +253,21 @@ function saveUserInterest ($interest) {
 		$mysqli->close();
 		
 		return $result;
-	}	
+	}
 		
 	function getAllUserInterests() {
 		
 		$database = "if16_sandra_2";
 		$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $database);
 		
-		$stmt = $mysqli->prepare("SELECT interest FROM interests
+		$stmt = $mysqli->prepare("
+			SELECT interest FROM interests
 			JOIN user_interests 
 			ON interests.id=user_interests.interest_id
-			WHERE user_interests.user_id = ?");
+			WHERE user_interests.user_id = ?
+		");
 
-		$stmt->bind_param ("i", $_SESSION["user_id"]);
+		$stmt->bind_param ("i", $_SESSION["userId"]);
 		echo $mysqli->error;
 		
 		$stmt->bind_result($interest);
