@@ -81,6 +81,7 @@ Tere tulemast <a href="user.php"><?=$_SESSION["userEmail"];?>!</a>
 			$html .= "<td>".$c->id."</td>";
 			$html .= "<td>".$c->plate."</td>";
 			$html .= "<td style='background-color:".$c->color."'>".$c->color."</td>";
+			$html .= "<td><a href='edit.php?id=".$c->id."'>edit.php?id=".$c->id."</a></td>";
 	$html .= "</tr>";
 	
 		
